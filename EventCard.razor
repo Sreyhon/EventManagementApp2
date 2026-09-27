@@ -1,0 +1,47 @@
+﻿@using EventManagementApp.Models
+
+<div class="card h-100 shadow-sm">
+    <div class="card-body">
+
+        <h3 class="card-title">@Event.Name</h3>
+
+        <p>
+            <strong>Date:</strong>
+            @Event.Date.ToString("dd MMM yyyy")
+        </p>
+
+        <p>
+            <strong>Location:</strong>
+            @Event.Location
+        </p>
+
+        <p>
+            @Event.Description
+        </p>
+
+        <p>
+            <strong>Available Seats:</strong>
+            @Event.AvailableSeats
+        </p>
+
+        <button class="btn btn-primary"
+                @onclick="RegisterClicked">
+            Register
+        </button>
+
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public Event Event { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<int> OnRegister { get; set; }
+
+    private async Task RegisterClicked()
+    {
+        await OnRegister.InvokeAsync(Event.Id);
+    }
+}
