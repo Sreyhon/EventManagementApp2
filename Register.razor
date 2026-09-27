@@ -1,0 +1,120 @@
+﻿@page "/register"
+@page "/register/{EventId:int}"
+
+@using EventManagementApp.Models
+@using EventManagementApp.Services
+
+@inject EventService EventService
+
+<PageTitle>Registration</PageTitle>
+
+<h1>Event Registration</h1>
+
+<EditForm Model="registration"
+          OnValidSubmit="HandleSubmit">
+
+    <DataAnnotationsValidator />
+
+    <ValidationSummary />
+
+    <div class="mb-3">
+        <label>Name</label>
+
+        <InputText class="form-control"
+                   @bind-Value="registration.Name" />
+
+        <ValidationMessage For="@(() => registration.Name)" />
+    </div>
+
+    <div class="mb-3">
+        <label>Email</label>
+
+        <InputText class="form-control"
+                   @bind-Value="registration.Email" />
+
+        <ValidationMessage For="@(() => registration.Email)" />
+    </div>
+
+    <div class="mb-3">
+        <label>Phone</label>
+
+        <InputText class="form-control"
+                   @bind-Value="registration.Phone" />
+
+        <ValidationMessage For="@(() => registration.Phone)" />
+    </div>
+
+    <div class="mb-3">
+        <label>Event</label>
+
+        <InputSelect class="form-control"
+                     @bind-Value="registration.EventId">
+
+            <option value="0">
+                -- Select Event --
+            </option>
+
+            @foreach (var item in events)
+            {
+                <option value="@item.Id">
+                    @item.Name
+                </option>
+            }
+
+        </InputSelect>
+
+        <ValidationMessage For="@(() => registration.EventId)" />
+    </div>
+
+    <button type="submit"
+            class="btn btn-success">
+        Register
+    </button>
+
+</EditForm>
+
+@if (!string.IsNullOrEmpty(message))
+{
+    <div class="alert alert-info mt-3">
+        @message
+    </div>
+}
+
+@code {
+
+    [Parameter]
+    public int EventId { get; set; }
+
+    private Registration registration = new();
+
+    private List<Event> events = new();
+
+    private string message = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        events = EventService.GetEvents();
+
+        if (EventId > 0)
+        {
+            registration.EventId = EventId;
+        }
+    }
+
+    private void HandleSubmit()
+    {
+        bool success = EventService.Register(registration);
+
+        if (success)
+        {
+            message = "Registration successful!";
+
+            registration = new Registration();
+        }
+        else
+        {
+            message =
+                "Registration failed. The event may be full.";
+        }
+    }
+}

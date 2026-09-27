@@ -1,0 +1,85 @@
+﻿@page "/attendance"
+
+@using EventManagementApp.Models
+@using EventManagementApp.Services
+
+@inject EventService EventService
+
+<PageTitle>Attendance</PageTitle>
+
+<h1>Attendance Tracker</h1>
+
+@if (registrations.Count == 0)
+{
+    <p>No registrations yet.</p>
+}
+else
+{
+    <table class="table table-bordered">
+
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Event</th>
+                <th>Attendance</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            @foreach (var registration in registrations)
+            {
+                var eventItem =
+                EventService.GetEvent(
+                registration.EventId);
+
+                <tr>
+                    <td>@registration.Name</td>
+
+                    <td>@registration.Email</td>
+
+                    <td>@eventItem?.Name</td>
+
+                    <td>
+                        <input type="checkbox"
+                               checked="@registration.IsPresent"
+                               @onchange="@(e =>
+                               UpdateAttendance(
+                                   registration.Id,
+                                   e.Value is true))" />
+
+                @(registration.IsPresent
+                ? "Present"
+                : "Absent")
+            </td>
+        </tr>
+                }
+
+        </tbody>
+
+    </table>
+}
+
+@code {
+
+    private List<Registration> registrations = new();
+
+    protected override void OnInitialized()
+    {
+        registrations =
+            EventService.GetRegistrations();
+    }
+
+    private void UpdateAttendance(
+        int id,
+        bool isPresent)
+    {
+        EventService.UpdateAttendance(
+            id,
+            isPresent);
+
+        registrations =
+            EventService.GetRegistrations();
+    }
+}

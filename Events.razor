@@ -1,0 +1,40 @@
+﻿@page "/events"
+
+@using EventManagementApp.Models
+@using EventManagementApp.Services
+
+@inject EventService EventService
+@inject NavigationManager Navigation
+
+<PageTitle>Events</PageTitle>
+
+<h1>Upcoming Events</h1>
+
+<div class="row">
+
+    @foreach (var item in events)
+    {
+        <div class="col-md-4 mb-4">
+
+            <EventCard Event="item"
+                       OnRegister="RegisterForEvent" />
+
+        </div>
+    }
+
+</div>
+
+@code {
+
+    private List<Event> events = new();
+
+    protected override void OnInitialized()
+    {
+        events = EventService.GetEvents();
+    }
+
+    private void RegisterForEvent(int eventId)
+    {
+        Navigation.NavigateTo($"/register/{eventId}");
+    }
+}
